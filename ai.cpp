@@ -63,7 +63,7 @@ best_move_return_and_undo:
 	return best_move;
 }
 
-Move AI::get_best_move(int max_depth) const {
+AI::best_move_t AI::get_best_move(int max_depth) const {
 	State copy = state;
-	return get_best_move_helper(copy, 0, max_depth).move;
+	return get_best_move_helper(copy, 0, max_depth);
 }

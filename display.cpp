@@ -1,6 +1,8 @@
 #include "macros.h"
 #include "display.h"
 
+using namespace std;
+
 char piece_char(PieceType type) {
 	switch(type) {
 		case Empty:
@@ -75,8 +77,12 @@ void Display::print_info() const {
 	}
 }
 
-void Display::set_error(const char *err) {
+void Display::set_error(string err) {
 	error = err;
+}
+
+void Display::set_message(string msg) {
+	message = msg;
 }
 
 void Display::update() const {
@@ -86,11 +92,15 @@ void Display::update() const {
 	addch('\n');
 	print_info();
 
-	if(error) {
+	if(!error.empty()) {
 		addch('\n');
 		attron(COLOR_PAIR(2));
-		printw("%s\n", error);
+		printw("%s\n", error.c_str());
 		attroff(COLOR_PAIR(2));
+	}
+
+	if(!message.empty()) {
+		printw("\n%s\n", message.c_str());
 	}
 
 	move(cursor_y, cursor_x);
@@ -144,7 +154,7 @@ const Move Display::get_player_move() {
 				continue;
 		}
 
-		set_error(NULL);
+		set_error("");
 
 		cursor_x = CLAMP(0, cursor_x, 4);
 		cursor_y = CLAMP(0, cursor_y, 4);

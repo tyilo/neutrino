@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 #include <unistd.h>
 
@@ -11,14 +12,25 @@ using namespace std;
 
 Move ai_get_move(State &s, Display &d) {
 	sleep(1);
-	return AI(s).get_best_move(6);
+	AI::best_move_t best_move = AI(s).get_best_move(6);
+
+	if(best_move.winner != None) {
+		stringstream ss;
+		ss << player_name(best_move.winner) << " will win in " << best_move.depth << " turn" << (best_move.depth == 1? "": "s") << ".";
+		d.set_message(ss.str());
+	} else {
+		d.set_message("");
+	}
+
+	return best_move.move;
 }
 
 Move player_get_move(State &s, Display &d) {
+	d.set_message("");
 	return d.get_player_move();
 }
 
-typedef typeof(player_get_move) *move_func;
+typedef decltype(player_get_move) *move_func;
 
 void play_game(move_func white_move, move_func black_move) {
 	State s = State();

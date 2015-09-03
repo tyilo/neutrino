@@ -3,6 +3,8 @@
 #include <vector>
 #include <utility>
 
+#include <string.h>
+
 enum PieceType : char {
 	Empty,
 	WhitePiece,
@@ -33,7 +35,7 @@ const char *player_name(Player p);
 
 class State {
 public:
-	PieceType board[5][5] = {Empty};
+	PieceType board[5][5] = {{Empty}};
 	size_t turn = 0;
 
 	State();
