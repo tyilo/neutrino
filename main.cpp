@@ -57,6 +57,7 @@ void play_game(move_func white_move, move_func black_move) {
 		s.perform_move(m);
 	}
 
+	d.set_message("");
 	d.update();
 
 	getch();
