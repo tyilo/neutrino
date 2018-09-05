@@ -34,6 +34,8 @@ Display::Display(const State &s) : state(s) {
 	// Error text
 	init_pair(2, COLOR_RED, COLOR_BLACK);
 
+	getmaxyx(stdscr, max_y, max_x);
+
 	update();
 }
 
@@ -41,19 +43,52 @@ Display::~Display() {
 	endwin();
 }
 
+int Display::x_offset() const {
+	int board_width = (2 * padding_x + 1) * 5;
+	return max_x / 2 - board_width / 2;
+}
+
+int Display::y_offset() const {
+	int board_height = (2 * padding_y + 1) * 5;
+	return max_y / 2 - board_height / 2;
+}
+
+void Display::newline() const {
+	addch('\n');
+	for (int i = 0; i < x_offset(); i++) {
+		addch(' ');
+	}
+}
+
 void Display::print_board() const {
 	for(int y = 0; y < 5; y++) {
-		for(int x = 0; x < 5; x++) {
-			bool white = (y + x) % 2;
-			if(white) {
-				attron(COLOR_PAIR(1));
+		for(int oy = -padding_y; oy <= padding_y; oy++) {
+			for(int x = 0; x < 5; x++) {
+				for(int ox = -padding_x; ox <= padding_x; ox++) {
+					bool white = (y + x) % 2;
+					if(white) {
+						attron(COLOR_PAIR(1));
+					}
+
+					/*
+					bool left = x == 0 && ox == -padding_x;
+					bool right = x == 4 && ox == padding_x;
+					bool top = y == 0 && oy == -padding_y;
+					bool bottom = y == 4 && oy == padding_y;
+					*/
+
+					if (ox == 0 && oy == 0) {
+						addch(piece_char(state.board[y][x]));
+					} else {
+						addch(' ');
+					}
+					if(white) {
+						attroff(COLOR_PAIR(1));
+					}
+				}
 			}
-			addch(piece_char(state.board[y][x]));
-			if(white) {
-				attroff(COLOR_PAIR(1));
-			}
+			newline();
 		}
-		addch('\n');
 	}
 }
 
@@ -86,15 +121,17 @@ void Display::set_message(string msg) {
 	message = msg;
 }
 
-void Display::update() const {
-	move(0, 0);
+void Display::update() {
+	getmaxyx(stdscr, max_y, max_x);
+
+	move(y_offset(), x_offset());
 
 	print_board();
-	addch('\n');
+	newline();
 	print_info();
 
 	if(!error.empty()) {
-		addch('\n');
+		newline();
 		attron(COLOR_PAIR(2));
 		printw("%s\n", error.c_str());
 		attroff(COLOR_PAIR(2));
@@ -104,8 +141,15 @@ void Display::update() const {
 		printw("\n%s\n", message.c_str());
 	}
 
-	move(cursor_y, cursor_x);
+	move_with_padding(cursor_y, cursor_x);
 	refresh();
+}
+
+void Display::move_with_padding(int y, int x) const {
+	auto scale = [](int z, int padding){
+		return (2 * padding + 1) * z + padding;
+	};
+	move(y_offset() + scale(y, padding_y), x_offset() + scale(x, padding_x));
 }
 
 const Move Display::get_player_move() {
@@ -115,7 +159,7 @@ const Move Display::get_player_move() {
 
 	bool from_chosen = false;
 
-	move(cursor_y, cursor_x);
+	move_with_padding(cursor_y, cursor_x);
 
 	int c;
 	while((c = getch())) {
@@ -159,9 +203,9 @@ const Move Display::get_player_move() {
 
 		cursor_x = CLAMP(0, cursor_x, 4);
 		cursor_y = CLAMP(0, cursor_y, 4);
-		move(cursor_y, cursor_x);
+		move_with_padding(cursor_y, cursor_x);
 	}
 player_input_done:
-	
+
 	return m;
 }
