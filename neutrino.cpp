@@ -20,6 +20,7 @@ PieceType piece_for_player(Player p) {
 		default:
 			throw "No piece for player None!";
 	}
+	__builtin_unreachable();
 }
 
 Player opposite_player(Player p) {
@@ -31,6 +32,7 @@ Player opposite_player(Player p) {
 		case Black:
 			return White;
 	}
+	__builtin_unreachable();
 }
 
 const char *player_name(Player p) {
@@ -42,6 +44,7 @@ const char *player_name(Player p) {
 		case Black:
 			return "Black";
 	}
+	__builtin_unreachable();
 }
 
 #define INCDIR(dir) (((dir) >= 4)? ((dir) + 1): (dir))

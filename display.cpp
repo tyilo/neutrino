@@ -14,6 +14,7 @@ char piece_char(PieceType type) {
 		case Neutrino:
 			return 'N';
 	}
+	__builtin_unreachable();
 }
 
 Display::Display(const State &s) : state(s) {
