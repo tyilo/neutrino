@@ -195,6 +195,10 @@ const Move Display::get_player_move() {
 					goto player_input_done;
 				}
 				break;
+			case KEY_RESIZE:
+				clear();
+				update();
+				break;
 			default:
 				continue;
 		}
