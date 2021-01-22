@@ -10,33 +10,24 @@ bool operator<(const State & s1, const State & s2) {
 int main() {
 	State s;
 	set<State> S;
-	queue<pair<int, State>> Q;
-	Q.push({0, s});
 	S.insert(s);
+	cout << "0: 1" << endl;
 
-	int pd = -1;
-	while (!Q.empty()) {
-		auto [d, s] = Q.front();
-		Q.pop();
+	int i = 0;
+	while (!S.empty()) {
+		set<State> S_new;
 
-		if (pd != d) {
-			assert(d == pd + 1);
-
-			cout << d << ": " << S.size() << endl;
-
-			pd = d;
-		}
-
-		if (s.get_winner() != None) continue;
-
-		for (auto &m : s.get_possible_moves()) {
-			State s2 = s;
-			s2.perform_move(m);
-
-			auto [_, inserted] = S.insert(s2);
-			if (inserted) {
-				Q.push({d + 1, s2});
+		for (const auto & s : S) {
+			if (s.get_winner() != None) continue;
+			for (auto m : s.get_possible_moves()) {
+				State s2 = s;
+				s2.perform_move(m);
+				S_new.insert(s2);
 			}
 		}
+
+		S = S_new;
+		i++;
+		cout << i << ": " << S.size() << endl;
 	}
 }
